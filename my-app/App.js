@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import {
   Text,
   HStack,
@@ -17,7 +18,12 @@ import {
 } from 'native-base';
 // import { Platform } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
-// import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+
+GoogleSignin.configure({
+  webClientId: '',
+});
+
 // Define the config
 const config = {
   useSystemColorMode: false,
@@ -37,8 +43,27 @@ export default function App() {
       setLoad(false);
     }, 5000);
   };
+  async function onGoogleButtonPress() {
+    // Check if your device supports Google Play
+    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    // Get the users ID token
+    const { idToken } = await GoogleSignin.signIn();
 
-  const handleGoogleSignIn = () => {};
+    // Create a Google credential with the token
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+    // Sign-in the user with the credential
+    return auth().signInWithCredential(googleCredential);
+  }
+
+  const handleNewAccount = () => {
+    setLoad(true);
+    auth()
+      .createUserWithEmailAndPassword('teste@email.com', '123456')
+      .then(() => alert('Conta', 'Cadastrado com sucesso!'))
+      .catch((error) => console.log(error))
+      .finally(() => setLoad(false));
+  };
   return (
     <NativeBaseProvider>
       <Center _dark={{ bg: 'blueGray.900' }} _light={{ bg: 'blueGray.50' }} px={4} flex={1}>
@@ -84,7 +109,15 @@ export default function App() {
           <Button isLoading={load} isLoadingText="Entrando...." variant="outline" onPress={handleLoad}>
             Entrar
           </Button>
-          <Button isLoading={load} isLoadingText="Entrando...." variant="outline" onPress={handleLoad}>
+          <Button isLoading={load} isLoadingText="Entrando...." variant="outline" onPress={handleNewAccount}>
+            Entrar com email
+          </Button>
+          <Button
+            isLoading={load}
+            isLoadingText="Entrando...."
+            variant="outline"
+            onPress={() => onGoogleButtonPress().then(() => console.log('Signed in with Google!'))}
+          >
             Entrar com google
           </Button>
           <ToggleDarkMode />
