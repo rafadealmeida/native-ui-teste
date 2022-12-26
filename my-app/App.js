@@ -17,7 +17,7 @@ import {
 } from 'native-base';
 // import { Platform } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+// import { GoogleSignin } from '@react-native-google-signin/google-signin';
 // Define the config
 const config = {
   useSystemColorMode: false,
