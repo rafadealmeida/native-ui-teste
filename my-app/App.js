@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import {
-  Text,
-  HStack,
-  Switch,
-  useColorMode,
-  NativeBaseProvider,
-  extendTheme,
-} from 'native-base';
-import Login from './src/pages/Home';
+import { Text, HStack, Switch, useColorMode, NativeBaseProvider, extendTheme } from 'native-base';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Login from './src/pages/Login';
+import NewAccount from './src/pages/NewAccount';
 
 // Define the config
 const config = {
@@ -19,10 +15,22 @@ const config = {
 // extend the theme
 export const theme = extendTheme({ config });
 
+const Stack = createNativeStackNavigator();
+
 export default function App() {
   return (
     <NativeBaseProvider>
-      <Login />
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Login" options={{
+            headerShown:false
+          }} component={Login} />
+          <Stack.Screen name="NewAccount" options={{
+            title:'Criar conta'
+          }} component={NewAccount} />
+        </Stack.Navigator>
+      </NavigationContainer>
+      {/* <Login /> */}
       <ToggleDarkMode />
     </NativeBaseProvider>
   );

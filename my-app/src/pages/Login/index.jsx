@@ -16,7 +16,8 @@ import {
   Icon,
   Pressable,
 } from 'native-base';
-// import { Platform } from "react-native";
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import auth from '@react-native-firebase/auth';
 
@@ -24,7 +25,7 @@ GoogleSignin.configure({
   webClientId: '',
 });
 
-export default function Login() {
+export default function Login({navigation }) {
   const [load, setLoad] = useState(false);
   const [show, setShow] = useState(false);
 
@@ -96,12 +97,14 @@ export default function Login() {
           }
           placeholder="Senha"
         />
-        <Button isLoading={load} isLoadingText="Entrando...." variant="outline" onPress={handleLoad}>
-          Entrar
-        </Button>
-        <Button isLoading={load} isLoadingText="Entrando...." variant="outline" onPress={handleNewAccount}>
-          Entrar com email
-        </Button>
+        <HStack space={2} >
+          <Button isLoading={load} isLoadingText="Entrando...." variant="outline" onPress={handleLoad}>
+            Entrar
+          </Button>
+          <Button isLoading={load} isLoadingText="Entrando...." variant="outline" onPress={() => navigation.navigate('NewAccount')}>
+            Criar nova conta
+          </Button>
+        </HStack>
         <Button
           isLoading={load}
           isLoadingText="Entrando...."
