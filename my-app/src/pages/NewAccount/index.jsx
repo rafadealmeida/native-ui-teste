@@ -15,17 +15,24 @@ import {
   Image,
   Icon,
   Pressable,
+  Alert,
+  IconButton,
+  CloseIcon,
+  Box,
 } from 'native-base';
 import { MaterialIcons } from '@expo/vector-icons';
+import AlertSuccesAccount from '../../components/alert';
+
 import auth from '@react-native-firebase/auth';
 
 GoogleSignin.configure({
   webClientId: '',
 });
 
-export default function NewAccount({navigation}) {
+export default function NewAccount({ navigation }) {
   const [load, setLoad] = useState(false);
   const [show, setShow] = useState(false);
+  const [showAlert, setShowAlert] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
@@ -33,11 +40,26 @@ export default function NewAccount({navigation}) {
     setLoad(true);
     auth()
       .createUserWithEmailAndPassword(email, senha)
-      .then(() => Alert.alert('Conta', 'Cadastrado com sucesso!'))
-      .catch((error) => console.log(error))
+      .then((UserCredential) => {
+        const user = UserCredential.user;
+        setShowAlert('success');
+        console.log(user);
+        setTimeout(() => {
+          navigation.navigate('Login');
+        }, 2000);
+      })
+      .catch((error) => {
+        console.log(error);
+        console.log(error.message.split(' ')[0]);
+        if (error.message.split(' ')[0] === '[auth/email-already-in-use]') {
+          setShowAlert('inUse');
+          console.log('Conta já existente');
+        } else {
+          setShowAlert('fail');
+        }
+      })
       .finally(() => {
         setLoad(false);
-        navigation.navigate('Login');
       });
   };
 
@@ -80,6 +102,9 @@ export default function NewAccount({navigation}) {
           Criar conta
         </Button>
       </VStack>
+      {showAlert === 'success' && <AlertSuccesAccount status="success" />}
+      {showAlert === 'fail' && <AlertSuccesAccount status="error" />}
+      {showAlert === 'inUse' && <AlertSuccesAccount status="info" />}
     </Center>
   );
 }

@@ -22,12 +22,15 @@ import { MaterialIcons } from '@expo/vector-icons';
 import auth from '@react-native-firebase/auth';
 
 GoogleSignin.configure({
-  webClientId: '',
+  webClientId: '180449136029-6gs92s69u8teforhtgrlj6n88njqe48h.apps.googleusercontent.com',
 });
 
-export default function Login({navigation }) {
+export default function Login({ navigation }) {
   const [load, setLoad] = useState(false);
+  const [loadGoogle, setLoadGoogle] = useState(false);
   const [show, setShow] = useState(false);
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
 
   const handleLoad = () => {
     setLoad(true);
@@ -35,24 +38,27 @@ export default function Login({navigation }) {
       setLoad(false);
     }, 5000);
   };
+
   async function onGoogleButtonPress() {
-    // Check if your device supports Google Play
-    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-    // Get the users ID token
-    const { idToken } = await GoogleSignin.signIn();
-
-    // Create a Google credential with the token
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-
-    // Sign-in the user with the credential
-    return auth().signInWithCredential(googleCredential);
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const { idToken, user } = await GoogleSignin.signIn();
+      console.log(user);
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      return auth().signInWithCredential(googleCredential);
+      navigation.navigate('Dashboard');
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  const handleNewAccount = () => {
+  const handleLogin = () => {
     setLoad(true);
     auth()
-      .createUserWithEmailAndPassword('teste@email.com', '123456')
-      .then(() => alert('Conta', 'Cadastrado com sucesso!'))
+      .signInWithEmailAndPassword(email, senha)
+      .then(() => {
+        navigation.navigate('Dashboard');
+      })
       .catch((error) => console.log(error))
       .finally(() => setLoad(false));
   };
@@ -76,6 +82,7 @@ export default function Login({navigation }) {
             md: '25%',
           }}
           InputLeftElement={<Icon as={<MaterialIcons name="person" />} size={5} ml="2" color="muted.400" />}
+          onChangeText={(text) => setEmail(text)}
         />
         <Input
           mx="3"
@@ -96,23 +103,22 @@ export default function Login({navigation }) {
             </Pressable>
           }
           placeholder="Senha"
+          onChangeText={(text) => setSenha(text)}
         />
-        <HStack space={2} >
-          <Button isLoading={load} isLoadingText="Entrando...." variant="outline" onPress={handleLoad}>
+        <HStack space={2}>
+          <Button isLoading={load} isLoadingText="Entrando...." variant="outline" onPress={handleLogin}>
             Entrar
           </Button>
-          <Button isLoading={load} isLoadingText="Entrando...." variant="outline" onPress={() => navigation.navigate('NewAccount')}>
+          <Button
+            variant="outline"
+            onPress={() => navigation.navigate('NewAccount')}
+          >
             Criar nova conta
           </Button>
         </HStack>
-        <Button
-          isLoading={load}
-          isLoadingText="Entrando...."
-          variant="outline"
-          onPress={() => onGoogleButtonPress().then(() => console.log('Signed in with Google!'))}
-        >
+        {/* <Button isLoading={loadGoogle} isLoadingText="Entrando...." variant="outline" onPress={onGoogleButtonPress}>
           Entrar com google
-        </Button>
+        </Button> */}
       </VStack>
     </Center>
   );
