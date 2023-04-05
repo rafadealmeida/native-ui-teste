@@ -116,9 +116,9 @@ export default function Login({ navigation }) {
             Criar nova conta
           </Button>
         </HStack>
-        {/* <Button isLoading={loadGoogle} isLoadingText="Entrando...." variant="outline" onPress={onGoogleButtonPress}>
+        <Button isLoading={loadGoogle} isLoadingText="Entrando...." variant="outline" onPress={onGoogleButtonPress}>
           Entrar com google
-        </Button> */}
+        </Button>
       </VStack>
     </Center>
   );
